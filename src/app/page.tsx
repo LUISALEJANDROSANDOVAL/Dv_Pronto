@@ -27,7 +27,7 @@ export default function DashboardPage() {
             {/* Page Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+                <h1 className="text-2xl font-bold text-foreground">Panel de Operaciones</h1>
                 <p className="text-sm text-muted-foreground">
                   Centro de operaciones en tiempo real
                 </p>

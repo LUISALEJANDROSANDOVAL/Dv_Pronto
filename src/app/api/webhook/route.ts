@@ -57,12 +57,19 @@ export async function POST(req: NextRequest) {
     // 2. Clasificar intención con IA
     const analysis = await classifyIntent(text);
 
+    // Actualizar siempre el resumen y la intención en la conversación
+    await supabaseAdmin.from('conversations').update({
+      intent: analysis.intent,
+      summary: analysis.summary,
+      last_message: text,
+      updated_at: new Date().toISOString()
+    }).eq('id', conversation.id);
+
     // 3. Lógica de Handoff (WOW Factor)
     if (analysis.intent === 'wholesale' && conversation.status !== 'handoff') {
       await supabaseAdmin.from('conversations').update({
-        intent: 'wholesale',
         status: 'handoff',
-        summary: analysis.summary
+        crm_status: 'new' // <--- Se añade al CRM automáticamente
       }).eq('id', conversation.id);
 
       // Insertar alerta para el Dashboard (Realtime)

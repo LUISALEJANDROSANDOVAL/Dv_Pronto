@@ -13,11 +13,11 @@ import {
 import { cn } from "@/lib/utils"
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: Inbox, label: "Inbox Omnicanal", href: "/inbox" },
-  { icon: Users, label: "CRM Mayoristas", href: "/crm" },
-  { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: Settings, label: "IA Config", href: "/config" },
+  { icon: LayoutDashboard, label: "Panel Principal", href: "/" },
+  { icon: Inbox, label: "Chats Activos", href: "/inbox" },
+  { icon: Users, label: "Clientes Mayoristas", href: "/crm" },
+  { icon: BarChart3, label: "Catálogo Productos", href: "/analytics" },
+  { icon: Settings, label: "Configuración", href: "/config" },
 ]
 
 export function Sidebar() {
