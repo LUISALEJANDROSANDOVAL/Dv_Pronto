@@ -35,12 +35,15 @@ export default function CRMPage() {
 
   async function fetchLeads() {
     setLoading(true);
-    // Solo traemos conversaciones con intención mayorista
-    const { data } = await supabase
+    console.log("Buscando leads mayoristas...");
+    const { data, error } = await supabase
       .from('conversations')
       .select('*')
       .eq('intent', 'wholesale')
       .order('updated_at', { ascending: false });
+    
+    if (error) console.error("Error al traer leads:", error);
+    console.log("Leads encontrados:", data?.length);
     
     setLeads(data || []);
     setLoading(false);
