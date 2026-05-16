@@ -34,7 +34,7 @@ export function ChatCard({ chat, isSelected, onClick }: ChatCardProps) {
               chat.status === "ai_handled" && "bg-muted text-muted-foreground"
             )}
           >
-            {chat.avatar}
+            {chat.customer_name?.[0] || 'C'}
           </AvatarFallback>
         </Avatar>
         {chat.unread > 0 && (
@@ -48,14 +48,14 @@ export function ChatCard({ chat, isSelected, onClick }: ChatCardProps) {
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center justify-between gap-2">
           <span className="truncate text-sm font-medium text-foreground">
-            {chat.name}
+            {chat.customer_name}
           </span>
           <span className="flex-shrink-0 text-xs text-muted-foreground">
             {chat.time}
           </span>
         </div>
         <p className="mb-2 line-clamp-1 text-xs text-muted-foreground">
-          {chat.lastMessage}
+          {chat.last_message}
         </p>
 
         {/* Status Badge */}
@@ -63,17 +63,17 @@ export function ChatCard({ chat, isSelected, onClick }: ChatCardProps) {
           variant="outline"
           className={cn(
             "text-[10px] font-medium",
-            chat.status === "waiting_human" &&
+            chat.status === "handoff" &&
               "border-destructive/30 bg-destructive/10 text-destructive",
-            chat.status === "ai_handled" &&
+            chat.status === "active" &&
               "border-muted-foreground/30 bg-muted text-muted-foreground",
-            chat.status === "wholesale_lead" &&
+            chat.intent === "wholesale" &&
               "border-primary/30 bg-primary/10 text-primary"
           )}
         >
-          {chat.status === "waiting_human" && "Esperando Humano 🚨"}
-          {chat.status === "ai_handled" && "IA Manejando 🤖"}
-          {chat.status === "wholesale_lead" && "Lead Mayorista"}
+          {chat.status === "handoff" && "Atención Humana 🚨"}
+          {chat.status === "active" && "IA Manejando 🤖"}
+          {chat.intent === "wholesale" && "Lead Mayorista"}
         </Badge>
       </div>
     </button>

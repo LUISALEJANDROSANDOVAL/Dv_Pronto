@@ -1,5 +1,7 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { supabase } from "@/lib/supabase"
 import {
   AlertTriangle,
   ShoppingCart,
@@ -13,10 +15,57 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
-import { mockHandoffData } from "@/lib/mock-data"
 
-export function HandoffPanel() {
-  const data = mockHandoffData
+export function HandoffPanel({ chatId }: { chatId: string }) {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!chatId) return
+    fetchHandoffData()
+
+    const channel = supabase
+      .channel(`handoff_sync_${chatId}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations', filter: `id=eq.${chatId}` }, (payload) => {
+        setData(prev => ({ ...prev, ...payload.new }))
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [chatId])
+
+  async function fetchHandoffData() {
+    setLoading(true)
+    const { data: conv } = await supabase.from('conversations').select('*').eq('id', chatId).single()
+    const { data: msgs } = await supabase.from('messages').select('*').eq('conversation_id', chatId).order('created_at', { ascending: false }).limit(5)
+    
+    if (conv) {
+      setData({
+        customerName: conv.customer_name,
+        intent: conv.intent === 'wholesale' ? 'Compra al por mayor' : 'Consulta Minorista',
+        sentiment: conv.status === 'handoff' ? 'Urgente' : 'Normal',
+        sentimentLevel: conv.status === 'handoff' ? 'urgent' : 'neutral',
+        detectedProducts: [], // Esto se podría sacar de una tabla de detecciones si existiera
+        summary: conv.summary || "Analizando conversación...",
+        messages: msgs?.map(m => ({
+          id: m.id,
+          content: m.content,
+          sender: m.sender === 'user' ? 'customer' : 'ai',
+          timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        })) || []
+      })
+    }
+    setLoading(false)
+  }
+
+  if (!chatId) return (
+    <div className="flex h-full items-center justify-center text-muted-foreground italic p-8 text-center border-2 border-dashed border-border rounded-xl">
+      Selecciona una conversación para ver el análisis de la IA
+    </div>
+  )
+  if (loading || !data) return <div className="p-8 text-center animate-pulse">Cargando análisis de IA...</div>
 
   return (
     <div className="flex h-full flex-col rounded-xl border border-border bg-card">

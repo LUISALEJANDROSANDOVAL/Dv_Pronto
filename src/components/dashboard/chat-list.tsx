@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { supabase } from "@/lib/supabase"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Search, MessageCircle } from "lucide-react"
 import { ChatCard } from "./chat-card"
-import { mockChats } from "@/lib/mock-data"
 
 interface ChatListProps {
   onSelectChat?: (chatId: string) => void
@@ -14,18 +14,45 @@ interface ChatListProps {
 
 export function ChatList({ onSelectChat, selectedChatId }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState("")
+  const [conversations, setConversations] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredChats = mockChats.filter(
+  useEffect(() => {
+    fetchConversations()
+
+    const channel = supabase
+      .channel('dashboard_chats_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, () => {
+        fetchConversations()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [])
+
+  async function fetchConversations() {
+    const { data } = await supabase
+      .from('conversations')
+      .select('*')
+      .order('updated_at', { ascending: false })
+    
+    setConversations(data || [])
+    setLoading(false)
+  }
+
+  const filteredChats = conversations.filter(
     (chat) =>
-      chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+      (chat.customer_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (chat.last_message || "").toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const waitingCount = mockChats.filter(
-    (c) => c.status === "waiting_human"
+  const waitingCount = conversations.filter(
+    (c) => c.status === "handoff"
   ).length
-  const leadsCount = mockChats.filter(
-    (c) => c.status === "wholesale_lead"
+  const leadsCount = conversations.filter(
+    (c) => c.intent === "wholesale"
   ).length
 
   return (

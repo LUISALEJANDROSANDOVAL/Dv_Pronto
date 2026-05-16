@@ -53,7 +53,7 @@ export default function DashboardPage() {
 
               {/* Handoff Panel - 65% */}
               <div className="col-span-8">
-                <HandoffPanel />
+                <HandoffPanel chatId={selectedChatId} />
               </div>
             </div>
 
