@@ -1,7 +1,7 @@
 "use client";
 
 import { DashboardHeader } from "@/components/dashboard/header";
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { Sidebar } from "@/components/dashboard/sidebar";
 import { ConversationsList } from "@/components/dashboard/conversations-list";
 import { ChatView } from "@/components/dashboard/chat-view";
 import { AlertNotification } from "@/components/dashboard/alert-notification";
@@ -13,7 +13,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen bg-slate-950 text-white overflow-hidden">
       {/* Sidebar de navegación principal */}
-      <DashboardSidebar />
+      <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header con métricas rápidas */}
