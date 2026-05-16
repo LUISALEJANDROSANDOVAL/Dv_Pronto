@@ -9,6 +9,7 @@ import {
   Users,
   BarChart3,
   Settings,
+  ShoppingBag,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -16,7 +17,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Panel Principal", href: "/" },
   { icon: Inbox, label: "Chats Activos", href: "/inbox" },
   { icon: Users, label: "Clientes Mayoristas", href: "/crm" },
-  { icon: BarChart3, label: "Catálogo Productos", href: "/analytics" },
+  { icon: ShoppingBag, label: "Catálogo Productos", href: "/products" },
   { icon: Settings, label: "Configuración", href: "/config" },
 ]
 
