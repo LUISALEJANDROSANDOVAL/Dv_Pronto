@@ -54,30 +54,30 @@ export function ConversationsList({
             key={conv.id}
             onClick={() => onSelect(conv.id)}
             className={cn(
-              "p-4 border-b border-slate-800/50 cursor-pointer hover:bg-slate-800/50 transition-colors relative group",
-              conv.status === 'handoff' ? "bg-orange-500/5" : "",
-              selectedId === conv.id ? "bg-slate-800" : ""
+              "p-5 border-b border-slate-800/40 cursor-pointer transition-all duration-300 relative group",
+              conv.status === 'handoff' ? "bg-gradient-to-r from-orange-500/5 to-transparent hover:from-orange-500/10" : "hover:bg-slate-800/30",
+              selectedId === conv.id ? "bg-slate-800/60 shadow-inner" : ""
             )}
           >
-            <div className="flex justify-between items-start mb-1">
-              <h3 className="font-semibold text-sm truncate pr-4">{conv.customer_name}</h3>
-              <span className="text-[10px] text-slate-500 whitespace-nowrap">
+            <div className="flex justify-between items-start mb-1.5">
+              <h3 className="font-bold text-[13px] text-slate-200 group-hover:text-white transition-colors truncate pr-4 tracking-tight">{conv.customer_name}</h3>
+              <span className="text-[10px] text-slate-500 whitespace-nowrap font-medium tracking-wide">
                 {formatDistanceToNow(new Date(conv.updated_at), { addSuffix: true, locale: es })}
               </span>
             </div>
             
-            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+            <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
               {conv.last_message}
             </p>
 
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 mt-3">
               {conv.intent === 'wholesale' && (
-                <span className="text-[9px] bg-orange-500/20 text-orange-500 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                <span className="text-[9px] bg-orange-500/10 border border-orange-500/20 text-orange-500 font-bold px-2 py-0.5 rounded uppercase tracking-widest shadow-sm">
                   Mayorista
                 </span>
               )}
               {conv.status === 'handoff' && (
-                <span className="text-[9px] bg-red-500/20 text-red-500 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">
+                <span className="text-[9px] bg-red-500/10 border border-red-500/20 text-red-500 font-bold px-2 py-0.5 rounded uppercase tracking-widest shadow-[0_0_10px_rgba(239,68,68,0.2)] animate-pulse">
                   Requiere Humano
                 </span>
               )}
@@ -85,7 +85,7 @@ export function ConversationsList({
 
             {/* Punto de notificación si es nuevo o crítico */}
             {conv.status === 'handoff' && (
-              <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-full group-hover:h-12 transition-all"></div>
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full group-hover:h-12 transition-all shadow-[0_0_8px_rgba(249,115,22,0.6)]"></div>
             )}
           </div>
         ))

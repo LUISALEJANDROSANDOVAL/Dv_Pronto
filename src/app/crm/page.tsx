@@ -35,18 +35,19 @@ export default function CRMPage() {
 
   async function fetchLeads() {
     setLoading(true);
-    console.log("Buscando leads mayoristas...");
-    const { data, error } = await supabase
-      .from('conversations')
-      .select('*')
-      .eq('intent', 'wholesale')
-      .order('updated_at', { ascending: false });
-    
-    if (error) console.error("Error al traer leads:", error);
-    console.log("Leads encontrados:", data?.length);
-    
-    setLeads(data || []);
-    setLoading(false);
+    try {
+      const response = await fetch('/api/conversations?intent=wholesale');
+      if (response.ok) {
+        const data = await response.json();
+        setLeads(data || []);
+      } else {
+        console.error("Error al traer leads desde la API");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud de leads:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -82,36 +83,37 @@ export default function CRMPage() {
               <div key={column.id} className="min-w-[300px] w-full flex flex-col">
                 <div className="flex items-center justify-between mb-4 px-2">
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${column.color}`} />
-                    <h3 className="font-bold text-sm uppercase tracking-wider text-slate-300">{column.label}</h3>
+                    <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] opacity-80 ${column.color}`} />
+                    <h3 className="font-bold text-[11px] uppercase tracking-widest text-slate-300">{column.label}</h3>
                   </div>
-                  <Badge variant="outline" className="bg-slate-900 border-slate-800 text-slate-500 text-[10px]">
+                  <Badge variant="outline" className="bg-slate-900/50 border-slate-700/50 text-slate-400 text-[10px] backdrop-blur-md">
                     {leads.filter(l => (l.crm_status || 'new') === column.id).length}
                   </Badge>
                 </div>
 
-                <div className="flex-1 bg-slate-900/30 rounded-2xl border border-slate-800/50 p-3 space-y-4 overflow-y-auto">
+                <div className="flex-1 bg-slate-900/10 backdrop-blur-sm rounded-3xl border border-slate-800/30 p-3 space-y-4 overflow-y-auto">
                   {leads.filter(l => (l.crm_status || 'new') === column.id).map(lead => (
                     <div 
                       key={lead.id}
-                      className="bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-sm hover:border-orange-500/50 transition-all cursor-grab active:cursor-grabbing group"
+                      className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 p-5 rounded-2xl shadow-lg hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:-translate-y-1 transition-all duration-300 cursor-grab active:cursor-grabbing group relative overflow-hidden"
                     >
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs">
+                      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600/50 flex items-center justify-center font-bold text-xs text-white shadow-inner">
                           {lead.customer_name?.[0]}
                         </div>
-                        <button className="text-slate-600 hover:text-white">
+                        <button className="text-slate-500 hover:text-white transition-colors">
                           <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>
 
-                      <h4 className="font-bold text-white text-sm mb-1 group-hover:text-orange-500 transition-colors">
+                      <h4 className="font-bold text-white text-[13px] mb-0.5 tracking-tight group-hover:text-orange-400 transition-colors">
                         {lead.customer_name}
                       </h4>
-                      <p className="text-[11px] text-slate-500 mb-3">{lead.wa_id}</p>
+                      <p className="text-[10px] text-slate-500 font-mono tracking-widest mb-4">{lead.wa_id}</p>
 
-                      <div className="bg-slate-950/50 p-2 rounded-lg mb-4 border border-slate-800/50">
-                        <p className="text-[10px] text-slate-400 italic line-clamp-2">
+                      <div className="bg-slate-950/80 p-3 rounded-xl mb-4 border border-slate-800/60 shadow-inner">
+                        <p className="text-[11px] text-slate-300 italic line-clamp-2 leading-relaxed">
                           "{lead.summary || "Sin resumen de IA"}"
                         </p>
                       </div>

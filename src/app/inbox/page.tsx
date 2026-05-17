@@ -12,11 +12,17 @@ export default function InboxPage() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [activeConversation, setActiveConversation] = useState<any>(null);
 
-  // Cargar datos de la conversación seleccionada
   const handleSelectChat = async (id: string) => {
     setSelectedChatId(id);
-    const { data } = await supabase.from('conversations').select('*').eq('id', id).single();
-    setActiveConversation(data);
+    try {
+      const response = await fetch(`/api/conversations/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setActiveConversation(data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch conversation', e);
+    }
   };
 
   useEffect(() => {
