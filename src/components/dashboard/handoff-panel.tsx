@@ -38,26 +38,40 @@ export function HandoffPanel({ chatId }: { chatId: string }) {
 
   async function fetchHandoffData() {
     setLoading(true)
-    const { data: conv } = await supabase.from('conversations').select('*').eq('id', chatId).single()
-    const { data: msgs } = await supabase.from('messages').select('*').eq('conversation_id', chatId).order('created_at', { ascending: false }).limit(5)
-    
-    if (conv) {
-      setData({
-        customerName: conv.customer_name,
-        intent: conv.intent === 'wholesale' ? 'Compra al por mayor' : 'Consulta Minorista',
-        sentiment: conv.status === 'handoff' ? 'Urgente' : 'Normal',
-        sentimentLevel: conv.status === 'handoff' ? 'urgent' : 'neutral',
-        detectedProducts: [], // Esto se podría sacar de una tabla de detecciones si existiera
-        summary: conv.summary || "Analizando conversación...",
-        messages: msgs?.map(m => ({
-          id: m.id,
-          content: m.content,
-          sender: m.sender === 'user' ? 'customer' : 'ai',
-          timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        })) || []
-      })
+    try {
+      const [convRes, msgsRes] = await Promise.all([
+        fetch(`/api/conversations/${chatId}`),
+        fetch(`/api/messages?conversationId=${chatId}`)
+      ]);
+      
+      if (convRes.ok && msgsRes.ok) {
+        const conv = await convRes.json();
+        const allMsgs: any[] = await msgsRes.json();
+        
+        // Tomar los últimos 5 y revertirlos para mostrar el más reciente primero si es necesario
+        // O mantener el orden cronológico
+        const msgs = allMsgs.slice(-5).reverse();
+
+        setData({
+          customerName: conv.customer_name,
+          intent: conv.intent === 'wholesale' ? 'Compra al por mayor' : 'Consulta Minorista',
+          sentiment: conv.status === 'handoff' ? 'Urgente' : 'Normal',
+          sentimentLevel: conv.status === 'handoff' ? 'urgent' : 'neutral',
+          detectedProducts: [],
+          summary: conv.summary || "Analizando conversación...",
+          messages: msgs.map(m => ({
+            id: m.id,
+            content: m.content,
+            sender: m.sender === 'user' ? 'customer' : 'ai',
+            timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }))
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching handoff data:", error);
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   if (!chatId) return (

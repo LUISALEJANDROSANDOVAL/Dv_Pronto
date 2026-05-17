@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
 import { MessageSquare, Target, Timer, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -18,16 +17,19 @@ export function KPIGrid() {
   }, [])
 
   async function fetchStats() {
-    const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true })
-    const { count: leadCount } = await supabase.from('conversations').select('*', { count: 'exact', head: true }).eq('intent', 'wholesale')
-    const { count: activeCount } = await supabase.from('conversations').select('*', { count: 'exact', head: true }).eq('status', 'handoff')
-
-    setStats([
-      { id: '1', title: 'Mensajes Totales', value: msgCount?.toLocaleString() || '0', change: '+100%', status: 'positive' },
-      { id: '2', title: 'Tasa Contención IA', value: '94%', change: 'Óptimo', status: 'positive' },
-      { id: '3', title: 'Leads Mayoristas', value: leadCount?.toString() || '0', change: 'Urgente', status: 'urgent' },
-      { id: '4', title: 'Atención Requerida', value: activeCount?.toString() || '0', change: 'En vivo', status: 'neutral' },
-    ])
+    try {
+      const res = await fetch('/api/metrics')
+      const data = await res.json()
+      
+      setStats([
+        { id: '1', title: 'Mensajes Totales', value: data.msgCount?.toLocaleString() || '0', change: '+100%', status: 'positive' },
+        { id: '2', title: 'Tasa Contención IA', value: '94%', change: 'Óptimo', status: 'positive' },
+        { id: '3', title: 'Leads Mayoristas', value: data.leadCount?.toString() || '0', change: 'Urgente', status: 'urgent' },
+        { id: '4', title: 'Atención Requerida', value: data.activeCount?.toString() || '0', change: 'En vivo', status: 'neutral' },
+      ])
+    } catch (error) {
+      console.error("Error fetching metrics:", error)
+    }
   }
   return (
     <div className="grid grid-cols-4 gap-4">

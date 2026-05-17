@@ -43,12 +43,21 @@ export function ChatView({ conversationId }: { conversationId: string }) {
 
   async function fetchData() {
     setLoading(true);
-    const { data: conv } = await supabase.from('conversations').select('*').eq('id', conversationId).single();
-    const { data: msgs } = await supabase.from('messages').select('*').eq('conversation_id', conversationId).order('created_at', { ascending: true });
-    
-    setConversation(conv);
-    setMessages(msgs || []);
-    setLoading(false);
+    try {
+      const [convRes, msgsRes] = await Promise.all([
+        fetch(`/api/conversations/${conversationId}`),
+        fetch(`/api/messages?conversationId=${conversationId}`)
+      ]);
+      
+      if (convRes.ok && msgsRes.ok) {
+        setConversation(await convRes.json());
+        setMessages(await msgsRes.json());
+      }
+    } catch (error) {
+      console.error("Error fetching chat data:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (!conversationId) return null;
