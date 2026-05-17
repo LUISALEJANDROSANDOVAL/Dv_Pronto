@@ -68,10 +68,16 @@ export default function CRMPage() {
               <p className="text-sm text-slate-400 mt-1">Gestiona tus prospectos de alto valor filtrados por IA.</p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-800 transition-colors">
+              <button 
+                onClick={() => import("sonner").then(({ toast }) => toast.info("Filtros avanzados en desarrollo."))}
+                className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-800 transition-colors"
+              >
                 <Filter className="w-4 h-4" /> Filtrar
               </button>
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-transform hover:scale-105">
+              <button 
+                onClick={() => import("sonner").then(({ toast }) => toast.info("Para añadir un lead manualmente, usa la API o espera la v2."))}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-transform hover:scale-105"
+              >
                 <Plus className="w-4 h-4" /> Nuevo Socio
               </button>
             </div>
@@ -102,7 +108,10 @@ export default function CRMPage() {
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600/50 flex items-center justify-center font-bold text-xs text-white shadow-inner">
                           {lead.customer_name?.[0]}
                         </div>
-                        <button className="text-slate-500 hover:text-white transition-colors">
+                        <button 
+                          onClick={() => import("sonner").then(({ toast }) => toast.info("Edición de columnas bloqueada en modo Demo."))}
+                          className="text-slate-500 hover:text-white transition-colors"
+                        >
                           <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>

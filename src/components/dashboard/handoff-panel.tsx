@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 export function HandoffPanel({ chatId }: { chatId: string }) {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [takingControl, setTakingControl] = useState(false)
 
   useEffect(() => {
     if (!chatId) return
@@ -71,6 +72,31 @@ export function HandoffPanel({ chatId }: { chatId: string }) {
       console.error("Error fetching handoff data:", error);
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleTakeControl() {
+    setTakingControl(true);
+    try {
+      const res = await fetch(`/api/conversations/${chatId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'active', crm_status: 'in_progress' })
+      });
+      if (res.ok) {
+        import("sonner").then(({ toast }) => {
+          toast.success("¡Control asumido! La IA ha entrado en modo escucha.");
+        });
+      } else {
+        throw new Error("Failed to take control");
+      }
+    } catch (err) {
+      console.error(err);
+      import("sonner").then(({ toast }) => {
+        toast.error("Error al tomar el control del chat.");
+      });
+    } finally {
+      setTakingControl(false);
     }
   }
 
@@ -195,10 +221,12 @@ export function HandoffPanel({ chatId }: { chatId: string }) {
       <div className="border-t border-border bg-card/50 p-4">
         <Button
           size="lg"
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 glow-primary transition-all duration-300 hover:scale-[1.02]"
+          onClick={handleTakeControl}
+          disabled={takingControl || data.sentimentLevel !== 'urgent'}
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 glow-primary transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
         >
           <Hand className="mr-2 h-5 w-5" />
-          Tomar Control del Chat
+          {takingControl ? "Procesando..." : data.sentimentLevel === 'urgent' ? "Tomar Control del Chat" : "Chat Controlado"}
         </Button>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           Al tomar control, la IA entrará en modo de solo lectura para este chat.

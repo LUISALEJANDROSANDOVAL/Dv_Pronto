@@ -34,15 +34,22 @@ export function Topbar() {
         <div className="h-4 w-[1px] bg-slate-800" />
 
         {/* Notifications */}
-        <button className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-800 bg-slate-900 hover:bg-slate-800 hover:border-slate-700 transition-colors text-slate-400 hover:text-white">
+        <button 
+          onClick={() => import("sonner").then(({ toast }) => toast.info("No tienes notificaciones nuevas."))}
+          className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-800 bg-slate-900 hover:bg-slate-800 hover:border-slate-700 transition-colors text-slate-400 hover:text-white"
+        >
           <Bell className="h-4 w-4" />
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white shadow-[0_0_8px_rgba(249,115,22,0.6)]">
-            3
+          <span className="absolute right-2 top-2 flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500"></span>
           </span>
         </button>
 
-        {/* User Avatar */}
-        <div className="flex items-center gap-3 pl-2">
+        {/* User Profile */}
+        <button 
+          onClick={() => import("sonner").then(({ toast }) => toast.info("Ajustes de perfil y facturación próximamente."))}
+          className="flex items-center gap-3 pl-2"
+        >
           <div className="text-right hidden md:block">
             <p className="text-sm font-semibold text-white leading-none">Agente Demo</p>
             <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-wider">Operador</p>
@@ -50,7 +57,7 @@ export function Topbar() {
           <div className="h-9 w-9 rounded-full border border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-xs font-bold text-slate-300 shadow-inner">
             AD
           </div>
-        </div>
+        </button>
       </div>
     </header>
   )

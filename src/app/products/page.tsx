@@ -72,7 +72,12 @@ export default function ProductsPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <button className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 px-5 py-2.5 rounded-xl text-[13px] font-medium flex items-center gap-2 hover:bg-slate-800 hover:border-slate-700 transition-colors text-slate-300">
+            <button 
+              onClick={() => {
+                import("sonner").then(({ toast }) => toast.info("Filtros avanzados disponibles en la versión completa."));
+              }}
+              className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 px-5 py-2.5 rounded-xl text-[13px] font-medium flex items-center gap-2 hover:bg-slate-800 hover:border-slate-700 transition-colors text-slate-300"
+            >
               <Filter className="w-4 h-4 text-slate-400" /> Categoría
             </button>
           </div>
