@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
 import { Settings, Save, Brain, Zap, Bell, Shield, MessageSquare, Info } from "lucide-react";
@@ -18,28 +17,41 @@ export default function ConfigPage() {
   }, []);
 
   async function fetchConfig() {
-    const { data } = await supabase.from('config').select('*').single();
-    if (data) {
-      setKnowledgeBase(data.knowledge_base || "");
-      setBotTone(data.bot_tone || "amable");
+    try {
+      const res = await fetch('/api/config');
+      if (res.ok) {
+        const data = await res.json();
+        setKnowledgeBase(data.knowledge_base || "");
+        setBotTone(data.bot_tone || "amable");
+      }
+    } catch (error) {
+      console.error("Error al cargar config:", error);
     }
   }
 
   async function handleSave() {
     setSaving(true);
-    const { error } = await supabase.from('config').upsert({ 
-      id: 1, // Usamos un ID fijo para la config global
-      knowledge_base: knowledgeBase,
-      bot_tone: botTone,
-      updated_at: new Date().toISOString()
-    });
+    try {
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          knowledge_base: knowledgeBase,
+          bot_tone: botTone
+        })
+      });
 
-    if (error) {
-      toast.error("Error al guardar la configuración");
-    } else {
+      if (!res.ok) throw new Error("Error en la petición");
+
       toast.success("¡Cerebro actualizado! La IA ya conoce las nuevas reglas.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al guardar la configuración");
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   return (
